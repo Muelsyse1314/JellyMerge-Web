@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#a3d6c4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="薄荷色的小小水果果冻世界，点按投放，合成大西瓜。">
+  <title>今天也软乎乎</title>
+  <style>
+    *{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#a3d6c4}
+    body{font-family:system-ui,"PingFang SC","Microsoft YaHei",sans-serif;color:#65543b;touch-action:none;overscroll-behavior:none}
+    #canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+    .cover{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px;padding:24px;background:#a3d6c4 url('mint_paper_background.png') center/cover no-repeat;text-align:center}
+    #logo{width:420px;max-width:72vw;height:190px;object-fit:contain;filter:drop-shadow(0 4px 2px #5d9b8333)}
+    button{position:relative;font-family:inherit;font-weight:900;font-size:40px;line-height:1.1;min-height:70px;min-width:278px;padding:8px 32px 12px;border:3px solid #d7c3a3;border-radius:2px;background:#fff;color:#fff;-webkit-text-stroke:3px #685336;paint-order:stroke fill;text-shadow:1px 3px 0 #68533688;box-shadow:0 5px 4px #335e4f26;cursor:pointer}
+    button::before{content:'★';position:absolute;right:13px;top:-17px;color:#f3dc78;font-size:25px;-webkit-text-stroke:1px #fffdf0;text-shadow:0 2px 0 #a8967033;transform:rotate(12deg)}
+    button::after{content:'';position:absolute;right:0;bottom:0;width:14px;height:14px;background:linear-gradient(135deg,transparent 50%,#efe5d0 50%)}
+    button:hover{background:#fffdf4} button:focus-visible{outline:3px solid #789776;outline-offset:4px}
+    button:active{transform:translateY(2px);box-shadow:0 3px 0 #8eae9c44} button:disabled{cursor:wait;opacity:.7}
+    p{margin:0;font-size:15px;line-height:1.6} #progress{width:min(260px,65vw);height:8px;accent-color:#bba174}
+    #rotate{display:none;z-index:20} #rotate strong{font-size:26px} #rotate .phone{font-size:52px;transform:rotate(-90deg)}
+    #failure{max-width:34em;white-space:pre-line} [hidden]{display:none!important}
+    @media(orientation:portrait) and (max-width:900px){#rotate{display:flex}}
+  </style>
+  <link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
+<link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
+<link rel="manifest" href="index.manifest.json">
+
+</head>
+<body>
+  <canvas id="canvas" tabindex="0" aria-label="今天也软乎乎游戏"></canvas>
+  <div id="welcome" class="cover">
+    <img id="logo" src="title_wordmark.png" alt="今天也软乎乎">
+    <button id="start">开始游戏</button>
+    <progress id="progress" hidden></progress>
+    <p id="message" hidden></p>
+    <p id="failure" hidden></p>
+  </div>
+  <div id="rotate" class="cover"><span class="phone" aria-hidden="true">▯</span><strong>把手机横过来吧</strong><p>横屏一起软乎乎</p></div>
+  <noscript>请开启浏览器的 JavaScript 后再打开游戏。</noscript>
+  <script src="webgl_index_upload.js"></script>
+  <script src="index.js"></script>
+  <script>
+    const config={"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2799052,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+    const engine=new Engine(config);
+    const start=document.getElementById('start');
+    const progress=document.getElementById('progress');
+    start.addEventListener('click',()=>{
+      start.disabled=true; start.textContent='准备中…'; progress.hidden=false;
+      document.getElementById('message').textContent='小果冻马上就来';
+      document.getElementById('message').hidden=false;
+      if (matchMedia('(pointer:coarse)').matches && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().then(()=>screen.orientation?.lock?.('landscape')).catch(()=>{});
+      }
+      const missing=Engine.getMissingFeatures({threads:false});
+      if(missing.length){fail(new Error('这个浏览器暂时无法运行游戏，请用 Safari、Chrome 或 Edge 打开。'));return;}
+      engine.startGame({onProgress:(current,total)=>{
+        if(total>0){progress.max=total;progress.value=current;}
+      }}).then(()=>{
+        document.getElementById('welcome').hidden=true;
+        document.getElementById('canvas').focus();
+      }).catch(fail);
+    });
+    function fail(error){
+      console.error(error);
+      const message=document.getElementById('failure'); message.hidden=false;
+      message.textContent='加载没有完成，请刷新后再试。';
+      document.getElementById('message').textContent='建议用手机自带浏览器打开';
+      progress.hidden=true; start.hidden=true;
+    }
+    document.addEventListener('contextmenu',event=>event.preventDefault());
+  </script>
+</body>
+</html>
+
