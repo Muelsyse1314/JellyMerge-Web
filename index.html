@@ -28,6 +28,11 @@
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 <link rel="manifest" href="index.manifest.json">
 
+  <style>
+    @supports(height:100dvh){html,body{height:100dvh}}
+    @media(orientation:portrait){.mobile-web #rotate{display:flex}}
+    .cover{width:var(--visible-width,100%);height:var(--visible-height,100dvh);box-sizing:border-box;padding:calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left))}
+  </style>
 </head>
 <body>
   <canvas id="canvas" tabindex="0" aria-label="今天也软乎乎游戏"></canvas>
@@ -40,10 +45,11 @@
   </div>
   <div id="rotate" class="cover"><span class="phone" aria-hidden="true">▯</span><strong>把手机横过来吧</strong><p>横屏一起软乎乎</p></div>
   <noscript>请开启浏览器的 JavaScript 后再打开游戏。</noscript>
-  <script src="webgl_index_upload.js"></script>
+  <script src="mobile_viewport.js"></script>
   <script src="index.js"></script>
   <script>
-    const config={"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2799052,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+    const config={"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":2944092,"index.wasm":39514754},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4,"serviceWorker":"index.service.worker.js"};
+    if(window.softJellyMobile) config.canvasResizePolicy=0;
     const engine=new Engine(config);
     const start=document.getElementById('start');
     const progress=document.getElementById('progress');

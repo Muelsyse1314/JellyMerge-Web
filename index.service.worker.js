@@ -4,7 +4,7 @@
 // Incrementing CACHE_VERSION will kick off the install event and force
 // previously cached resources to be updated from the network.
 /** @type {string} */
-const CACHE_VERSION = '1790956128|189426019';
+const CACHE_VERSION = '1790987854|2400554';
 /** @type {string} */
 const CACHE_PREFIX = '今天也软乎乎-sw-cache-';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
@@ -14,7 +14,7 @@ const OFFLINE_URL = 'index.offline.html';
 const ENSURE_CROSSORIGIN_ISOLATION_HEADERS = false;
 // Files that will be cached on load.
 /** @type {string[]} */
-const CACHED_FILES = ["index.html","index.js","index.offline.html","index.icon.png","index.apple-touch-icon.png","index.audio.worklet.js","index.audio.position.worklet.js"];
+const CACHED_FILES = ["index.html", "index.js", "index.offline.html", "index.icon.png", "index.apple-touch-icon.png", "index.audio.worklet.js", "index.audio.position.worklet.js", "mint_paper_background.png", "title_wordmark.png", "mobile_viewport.js", "index.manifest.json", "index.144x144.png", "index.180x180.png", "index.512x512.png"];
 // Files that we might not want the user to preload, and will only be cached on first load.
 /** @type {string[]} */
 const CACHEABLE_FILES = ["index.wasm","index.pck"];
@@ -122,6 +122,16 @@ self.addEventListener(
 					}
 				}
 				let cached = await cache.match(event.request);
+                // The public site URL usually ends at /, while Godot caches
+                // index.html. Both navigate to the same entry when offline.
+                if (cached == null && isNavigate) {
+                    const requested = new URL(event.request.url);
+                    const scope = new URL(self.registration.scope);
+                    if (requested.pathname === scope.pathname) {
+                        cached = await cache.match(new URL(CACHED_FILES[0], scope).href);
+                    }
+                }
+
 				if (cached != null) {
 					if (ENSURE_CROSSORIGIN_ISOLATION_HEADERS) {
 						cached = ensureCrossOriginIsolationHeaders(cached);
